@@ -13,7 +13,7 @@ body[data-article-page="archive"] .article-page {
     gap: 13px;
     margin: 0 0 20px;
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: .16em;
     text-transform: uppercase;
 }
@@ -74,7 +74,7 @@ body[data-article-page="archive"] .article-page {
 .article-search-label,
 .article-filter-label {
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
 }
 
@@ -99,7 +99,7 @@ body[data-article-page="archive"] .article-page {
 .article-status {
     margin: 24px 0;
     color: var(--ink-soft);
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .article-list {
@@ -143,7 +143,7 @@ body[data-article-page="archive"] .article-page {
     gap: 7px 14px;
     margin: 0 0 10px;
     color: var(--copper);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -167,7 +167,7 @@ body[data-article-page="archive"] .article-page {
     overflow: hidden;
     margin: 0 0 18px;
     color: var(--ink-soft);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.65;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
@@ -183,7 +183,7 @@ body[data-article-page="archive"] .article-page {
     margin-top: auto;
     padding: 7px 2px;
     color: var(--ink);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     transition: transform .2s ease, color .2s ease;
 }
@@ -257,7 +257,7 @@ body[data-article-page="archive"] .article-page {
     gap: 10px;
     margin: 0 0 38px;
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .article-breadcrumb a:hover {
@@ -279,7 +279,7 @@ body[data-article-page="archive"] .article-page {
     gap: 8px 15px;
     margin: 19px 0 34px;
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .article-detail-cover {
@@ -305,7 +305,7 @@ body[data-article-page="archive"] .article-page {
 .article-content {
     min-width: 0;
     color: #28334d;
-    font-size: 18px;
+    font-size: 19px;
     line-height: 1.76;
     overflow-wrap: break-word;
 }
@@ -378,7 +378,7 @@ body[data-article-page="archive"] .article-page {
 .article-content figcaption {
     margin-top: 9px;
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.5;
 }
 
@@ -399,7 +399,7 @@ body[data-article-page="archive"] .article-page {
     overflow-x: auto;
     border-collapse: collapse;
     margin: 1.2em 0;
-    font-size: .88em;
+    font-size: .95em;
 }
 
 .article-content th,
@@ -430,7 +430,7 @@ body[data-article-page="archive"] .article-page {
 .article-aside p {
     margin: 20px 0 0;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .article-pagination {
@@ -464,7 +464,7 @@ body[data-article-page="archive"] .article-page {
 
 .article-page-link span {
     color: var(--ink-soft);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: .11em;
     text-transform: uppercase;
@@ -474,7 +474,7 @@ body[data-article-page="archive"] .article-page {
     display: -webkit-box;
     overflow: hidden;
     color: var(--ink);
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     line-height: 1.45;
     -webkit-box-orient: vertical;
@@ -586,7 +586,7 @@ body[data-article-page="archive"] .article-page {
         margin-bottom: 34px;
     }
     .article-content {
-        font-size: 17px;
+        font-size: 18px;
         line-height: 1.72;
     }
     .article-content p {
@@ -609,7 +609,7 @@ body[data-article-page="archive"] .article-page {
         left: 19px;
     }
     .article-page-link strong {
-        font-size: 14px;
+        font-size: 15px;
     }
 }
 

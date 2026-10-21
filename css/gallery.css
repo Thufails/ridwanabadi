@@ -31,13 +31,13 @@
     max-width: 340px;
     margin: 0 0 16px;
     color: var(--ink-soft);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.65;
 }
 
 .gallery-page-aside span {
     color: var(--copper);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 650;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -80,7 +80,7 @@
 
 .gallery-card figcaption>span {
     color: var(--copper);
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 650;
     letter-spacing: .13em;
     text-transform: uppercase;
@@ -89,7 +89,7 @@
 .gallery-card h2 {
     margin: 5px 0 5px;
     font-family: var(--sans);
-    font-size: 21px;
+    font-size: 22px;
     font-weight: 550;
     letter-spacing: -.025em;
     line-height: 1.25;
@@ -99,7 +99,7 @@
     max-width: 440px;
     margin: 0;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.55;
 }
 
@@ -115,7 +115,7 @@
 .gallery-return p {
     margin: 0;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .gallery-return .text-link {
@@ -132,7 +132,7 @@
         gap: 34px 20px;
     }
     .gallery-card h2 {
-        font-size: 19px;
+        font-size: 20px;
     }
 }
 
@@ -151,7 +151,7 @@
     .gallery-page-aside p {
         max-width: 460px;
         margin-bottom: 10px;
-        font-size: 15px;
+        font-size: 16px;
     }
     .gallery-collection {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -160,10 +160,10 @@
         padding-bottom: 52px;
     }
     .gallery-card h2 {
-        font-size: 18px;
+        font-size: 19px;
     }
     .gallery-card p {
-        font-size: 13px;
+        font-size: 15px;
     }
     .gallery-return {
         align-items: flex-start;

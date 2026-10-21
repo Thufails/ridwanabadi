@@ -112,7 +112,7 @@ button {
 }
 
 .brand-name {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: .12em;
     line-height: 1.35;
@@ -122,7 +122,7 @@ button {
     display: block;
     margin-top: 3px;
     color: var(--ink-soft);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
     letter-spacing: .12em;
 }
@@ -433,7 +433,7 @@ h2 em {
     padding-top: 3px;
     color: #d39370;
     font-family: var(--sans);
-    font-size: 9px;
+    font-size: 12px;
     letter-spacing: .1em;
 }
 
@@ -510,6 +510,12 @@ h2 em {
     line-height: 1.08;
 }
 
+#profile-title {
+    max-width: 700px;
+    font-size: clamp(38px, 3.65vw, 49px);
+    text-wrap: balance;
+}
+
 .intro-body {
     max-width: 470px;
     padding-top: 8px;
@@ -529,6 +535,46 @@ h2 em {
 
 .intro-body .text-link {
     margin-top: 7px;
+}
+
+.profile-bio {
+    margin-top: 38px;
+}
+
+.profile-bio-title {
+    margin: 0 0 17px;
+    color: var(--ink-soft);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+}
+
+.profile-bio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 34px 8%;
+}
+
+.profile-bio-grid p {
+    max-width: 66ch;
+    margin: 0 0 14px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.72;
+    text-align: justify;
+    text-align-last: left;
+    text-justify: inter-word;
+    hyphens: auto;
+}
+
+.profile-bio-grid p:last-child {
+    margin-bottom: 0;
+}
+
+.profile-bio-grid strong {
+    color: var(--ink);
+    font-weight: 650;
 }
 
 .expertise-strip {
@@ -647,6 +693,15 @@ h2 em {
     background: var(--paper-deep);
 }
 
+.services.section-pad {
+    padding-block: 54px;
+}
+
+.services .section-heading {
+    gap: 28px;
+    margin-bottom: 24px;
+}
+
 .section-heading {
     display: flex;
     align-items: flex-end;
@@ -678,6 +733,10 @@ h2 em {
     padding: 22px 2px;
     border-bottom: 1px solid var(--line);
     transition: padding .25s ease;
+}
+
+.services .service-row {
+    padding-block: 16px;
 }
 
 .service-row:hover {
@@ -1214,7 +1273,7 @@ h2 em {
     }
     .primary-nav a,
     .header-link {
-        font-size: 10px;
+        font-size: 14px;
     }
     .hero {
         min-height: 540px;
@@ -1259,7 +1318,7 @@ h2 em {
         height: 34px;
     }
     .brand-name {
-        font-size: 10px;
+        font-size: 12px;
     }
     .header-link {
         display: none;
@@ -1316,7 +1375,7 @@ h2 em {
     .primary-nav a {
         padding: 12px 0;
         border-bottom: 1px solid var(--line);
-        font-size: 12px;
+        font-size: 16px;
     }
     .primary-nav a:last-child {
         border-bottom: 0;
@@ -1335,7 +1394,7 @@ h2 em {
     }
     .eyebrow {
         margin-bottom: 20px;
-        font-size: 8px;
+        font-size: 11px;
     }
     h1 {
         margin-bottom: 18px;
@@ -1343,7 +1402,7 @@ h2 em {
     }
     .hero-intro {
         max-width: 400px;
-        font-size: 14px;
+        font-size: 18px;
     }
     .hero-actions {
         flex-wrap: wrap;
@@ -1351,7 +1410,7 @@ h2 em {
     }
     .hero-meta {
         margin-top: 24px;
-        font-size: 8px;
+        font-size: 12px;
     }
     .hero-visual {
         min-height: 365px;
@@ -1370,7 +1429,7 @@ h2 em {
     }
     .scroll-cue {
         bottom: 29px;
-        font-size: 8px;
+        font-size: 12px;
     }
     .intro {
         padding-top: 30px;
@@ -1384,8 +1443,25 @@ h2 em {
     .book-copy h2 {
         font-size: 39px;
     }
+    #profile-title {
+        font-size: clamp(31px, 6.5vw, 36px);
+    }
     .intro-body .lead {
         font-size: 18px;
+    }
+    .profile-bio {
+        margin-top: 28px;
+    }
+    .profile-bio-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    .profile-bio-grid p {
+        font-size: 15px;
+        line-height: 1.7;
+        text-align: left;
+        text-justify: auto;
+        hyphens: manual;
     }
     .expertise-strip {
         grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1393,7 +1469,7 @@ h2 em {
         margin-top: 30px;
     }
     .expertise-strip strong {
-        font-size: 13px;
+        font-size: 15px;
     }
     .achievement-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1410,7 +1486,7 @@ h2 em {
         font-size: 38px;
     }
     .achievement-card p {
-        font-size: 13px;
+        font-size: 15px;
     }
     .achievement-heading h3 {
         font-size: 24px;
@@ -1422,19 +1498,25 @@ h2 em {
         display: block;
         margin-bottom: 26px;
     }
+    .services.section-pad {
+        padding-block: 38px;
+    }
+    .services .section-heading {
+        margin-bottom: 20px;
+    }
     .section-aside {
         margin-top: 17px;
     }
     .service-row {
         grid-template-columns: 34px 1fr 20px;
         gap: 12px;
-        padding-block: 23px;
+        padding-block: 16px;
     }
     .service-row h3 {
         font-size: 22px;
     }
     .service-row p {
-        font-size: 11px;
+        font-size: 16px;
     }
     .work {
         padding-bottom: 52px;
@@ -1521,7 +1603,7 @@ h2 em {
     }
     .footer-bottom {
         gap: 16px;
-        font-size: 8px;
+        font-size: 13px;
     }
 }
 
@@ -1551,27 +1633,27 @@ h2 em {
 /* Clear, comfortably readable supporting type. */
 
 body {
-    font-size: 17px;
+    font-size: 18px;
 }
 
 .eyebrow,
 .section-kicker {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .primary-nav a,
 .header-link {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .button,
 .text-link {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .hero-meta,
 .scroll-cue {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .hero-meta {
@@ -1579,11 +1661,12 @@ body {
 }
 
 .intro-body p,
+.profile-bio-grid p,
 .service-row p,
 .section-aside,
 .book-copy p,
 .closing p {
-    font-size: 15px;
+    font-size: 16px;
 }
 
 .strip-label,
@@ -1592,26 +1675,48 @@ body {
     font-size: 12px;
 }
 
+.profile-bio-title,
+.achievement-kicker,
+.service-no {
+    font-size: 12px;
+}
+
+.achievement-card p {
+    font-size: 15px;
+}
+
+.gallery-heading p {
+    font-size: 16px;
+}
+
 .work-caption>span,
 .work-caption p,
 .article-tag,
 .article-read {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .image-label,
 .gallery-photo figcaption,
 .footer-main p,
 .footer-top {
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .footer-bottom {
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .article-card p {
-    font-size: 14px;
+    font-size: 16px;
+}
+
+.article-card-meta .article-number {
+    font-size: 15px;
+}
+
+.work-caption h3 {
+    font-size: 24px;
 }
 
 .hero-note {
@@ -1626,30 +1731,31 @@ body {
     }
     .eyebrow,
     .section-kicker {
-        font-size: 10px;
+        font-size: 11px;
     }
     .hero-intro {
-        font-size: 17px;
+        font-size: 18px;
     }
     .intro-body p,
+    .profile-bio-grid p,
     .service-row p,
     .section-aside,
     .book-copy p,
     .closing p {
-        font-size: 15px;
+        font-size: 16px;
     }
     .work-caption p,
     .article-card p {
-        font-size: 14px;
+        font-size: 15px;
     }
     .content-note {
-        font-size: 12px;
+        font-size: 13px;
     }
     .footer-top {
-        font-size: 14px;
+        font-size: 15px;
     }
     .footer-bottom {
-        font-size: 12px;
+        font-size: 13px;
     }
     .hero-image-frame img {
         object-position: center;

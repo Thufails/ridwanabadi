@@ -56,13 +56,13 @@
 
 .editor-heading .editor-local-note {
     color: var(--ink);
-    font-size: 14px;
+    font-size: 15px;
 }
 
 .editor-local-note span {
     margin-right: 7px;
     color: var(--copper);
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .editor-layout {
@@ -104,7 +104,7 @@
 
 .editor-panel-heading h2 {
     margin: 0;
-    font-size: 21px;
+    font-size: 22px;
     letter-spacing: -.025em;
 }
 
@@ -120,7 +120,7 @@
     gap: 7px;
     min-width: 0;
     color: var(--ink);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
 }
 
@@ -146,7 +146,7 @@
     background: white;
     color: var(--ink);
     font: inherit;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 400;
 }
 
@@ -166,7 +166,7 @@
 .editor-field small,
 .editor-help {
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 400;
 }
 
@@ -190,7 +190,7 @@
     color: #9e3d27;
     cursor: pointer;
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
     text-decoration: underline;
     text-underline-offset: 3px;
 }
@@ -213,7 +213,7 @@
     background: transparent;
     color: var(--ink);
     cursor: pointer;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .editor-toolbar button:hover,
@@ -288,7 +288,7 @@
 .editor-status {
     margin: 0;
     color: var(--ink-soft);
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .editor-status[data-state="error"] {
@@ -322,7 +322,7 @@
     border-bottom: 1px solid var(--line);
     padding: 15px 20px;
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .editor-preview {
@@ -342,7 +342,7 @@
     gap: 9px;
     margin: 0 0 10px;
     color: var(--copper);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: .12em;
     text-transform: uppercase;
@@ -368,7 +368,7 @@
     border-top: 1px solid var(--line);
     padding-top: 18px;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.75;
     overflow-wrap: anywhere;
 }
@@ -378,7 +378,7 @@
     border-top: 1px solid var(--line);
     padding: 14px 20px;
     color: var(--ink-soft);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 @media (max-width: 900px) {
@@ -398,15 +398,15 @@
     }
 
     .editor-header .brand-name {
-        font-size: 12px;
+        font-size: 13px;
     }
 
     .editor-header .brand-name span {
-        font-size: 8px;
+        font-size: 10px;
     }
 
     .editor-header .text-link {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .editor-shell {
