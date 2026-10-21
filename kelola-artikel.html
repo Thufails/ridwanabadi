@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Kelola Artikel Lokal — Ridwan Abadi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/article-editor.css">
+    <script src="js/article-editor.js" defer></script>
+</head>
+
+<body class="editor-body">
+    <header class="editor-header">
+        <a class="brand" href="index.html" aria-label="Ridwan Abadi, beranda">
+            <span class="brand-mark">RA</span>
+            <span class="brand-name">RIDWAN ABADI<span>SINERGI BUSINESS SOLUTION</span></span>
+        </a>
+        <a class="text-link" href="artikel.html">Lihat arsip artikel <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <main class="editor-shell">
+        <div class="editor-heading">
+            <p class="article-page-kicker"><span class="eyebrow-line"></span> Pengelolaan lokal</p>
+            <h1>Tulis artikel baru.</h1>
+            <p>Isi tulisan, cek pratinjau, lalu simpan ke arsip lokal. Gambar sampul disimpan di folder proyek, bukan sebagai tautan WordPress.</p>
+            <p class="editor-local-note"><span aria-hidden="true">●</span> Editor ini hanya bekerja ketika dijalankan di komputer lokal.</p>
+        </div>
+
+        <div class="editor-layout">
+            <form id="article-form" class="editor-form">
+                <section class="editor-panel" aria-labelledby="details-heading">
+                    <div class="editor-panel-heading">
+                        <span class="editor-step">01</span>
+                        <h2 id="details-heading">Informasi artikel</h2>
+                    </div>
+                    <label class="editor-field editor-field-full" for="article-title">Judul artikel <span aria-hidden="true">*</span>
+                        <input id="article-title" name="title" maxlength="180" required placeholder="Contoh: Strategi Menumbuhkan Bisnis dengan Makna">
+                    </label>
+                    <div class="editor-field-grid">
+                        <label class="editor-field" for="article-slug">Alamat artikel <span aria-hidden="true">*</span>
+                            <input id="article-slug" name="slug" maxlength="180" pattern="[a-z0-9]+(?:-[a-z0-9]+)*" required>
+                            <small>Otomatis dari judul; boleh disunting.</small>
+                        </label>
+                        <label class="editor-field" for="article-date">Tanggal terbit <span aria-hidden="true">*</span>
+                            <input id="article-date" name="date" type="date" required>
+                        </label>
+                        <label class="editor-field" for="article-category">Kategori
+                            <input id="article-category" name="category" maxlength="80" value="Artikel">
+                        </label>
+                        <label class="editor-field" for="article-tags">Tag
+                            <input id="article-tags" name="tags" maxlength="240" placeholder="Bisnis, Marketing, Nutrisi Jiwa">
+                            <small>Pisahkan beberapa tag dengan koma.</small>
+                        </label>
+                    </div>
+                    <label class="editor-field editor-field-full" for="article-excerpt">Ringkasan
+                        <textarea id="article-excerpt" name="excerpt" rows="3" maxlength="320" placeholder="Ringkasan singkat untuk kartu di halaman arsip."></textarea>
+                        <small id="excerpt-hint">Boleh dikosongkan; ringkasan bisa dibuat dari isi artikel.</small>
+                    </label>
+                </section>
+
+                <section class="editor-panel" aria-labelledby="cover-heading">
+                    <div class="editor-panel-heading">
+                        <span class="editor-step">02</span>
+                        <h2 id="cover-heading">Gambar sampul</h2>
+                    </div>
+                    <label class="editor-field editor-field-full" for="article-cover">Pilih gambar
+                        <input id="article-cover" name="cover" type="file" accept="image/jpeg,image/png,image/webp">
+                        <small>JPG, PNG, atau WebP; maksimal 5 MB. Opsional.</small>
+                    </label>
+                    <div id="cover-preview-wrap" class="editor-cover-preview" hidden>
+                        <img id="cover-preview" alt="Pratinjau gambar sampul">
+                        <button id="remove-cover" class="editor-remove-cover" type="button">Hapus gambar</button>
+                    </div>
+                </section>
+
+                <section class="editor-panel" aria-labelledby="content-heading">
+                    <div class="editor-panel-heading">
+                        <span class="editor-step">03</span>
+                        <h2 id="content-heading">Isi artikel</h2>
+                    </div>
+                    <div class="editor-toolbar" role="toolbar" aria-label="Format isi artikel">
+                        <button type="button" data-command="bold" aria-label="Tebal"><strong>B</strong></button>
+                        <button type="button" data-command="italic" aria-label="Miring"><em>I</em></button>
+                        <span class="editor-toolbar-divider" aria-hidden="true"></span>
+                        <button type="button" data-command="formatBlock" data-value="h2">Judul bagian</button>
+                        <button type="button" data-command="formatBlock" data-value="p">Paragraf</button>
+                        <button type="button" data-command="insertUnorderedList">• Daftar</button>
+                        <button type="button" data-command="insertOrderedList">1. Daftar</button>
+                        <button id="insert-link" type="button">Sisipkan tautan</button>
+                    </div>
+                    <div id="article-content" class="editor-content" contenteditable="true" role="textbox" aria-label="Isi artikel" aria-multiline="true" data-placeholder="Mulai tulis artikel di sini. Gunakan toolbar untuk memformat bagian penting."></div>
+                    <p class="editor-help">Tempel tulisan langsung di sini. Untuk saat ini gambar isi belum diunggah terpisah; gunakan gambar sampul di atas.</p>
+                </section>
+
+                <div class="editor-submit-row">
+                    <p id="editor-status" class="editor-status" role="status" aria-live="polite">Simpan akan langsung menambahkan artikel ke arsip lokal.</p>
+                    <button id="save-article" class="button button-dark editor-submit" type="submit">Simpan artikel <span aria-hidden="true">↗</span></button>
+                </div>
+            </form>
+
+            <aside class="editor-preview-panel" aria-labelledby="preview-heading">
+                <div class="editor-preview-topline"><span class="editor-step">PRATINJAU</span><span>Tampilan artikel</span></div>
+                <article class="editor-preview">
+                    <img id="preview-cover" class="editor-preview-cover" alt="" hidden>
+                    <p id="preview-meta" class="editor-preview-meta">ARTIKEL <span>·</span> TANGGAL</p>
+                    <h2 id="preview-title">Judul artikel akan muncul di sini</h2>
+                    <p id="preview-excerpt" class="editor-preview-excerpt">Ringkasan artikel akan terlihat di arsip.</p>
+                    <div id="preview-content" class="editor-preview-content"><p>Pratinjau isi akan muncul di sini saat kamu mulai menulis.</p></div>
+                </article>
+                <p class="editor-preview-note">Pratinjau ini untuk membantu pengecekan. Artikel baru akan tampil di website setelah proyek lokal dipublikasikan.</p>
+            </aside>
+        </div>
+    </main>
+</body>
+
+</html>
