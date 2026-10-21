@@ -313,11 +313,6 @@ h2 em {
     background: var(--forest-deep);
 }
 
-.button-dark span {
-    color: #d39370;
-    font-size: 17px;
-}
-
 .text-link {
     position: relative;
     display: inline-flex;
@@ -727,7 +722,7 @@ h2 em {
 
 .service-row {
     display: grid;
-    grid-template-columns: 64px 1fr 34px;
+    grid-template-columns: 64px 1fr;
     gap: 24px;
     align-items: center;
     padding: 22px 2px;
@@ -763,11 +758,6 @@ h2 em {
     margin-bottom: 0;
     color: var(--ink-soft);
     font-size: 12px;
-}
-
-.service-arrow {
-    color: var(--copper);
-    font-size: 22px;
 }
 
 .content-note {
@@ -1508,7 +1498,7 @@ h2 em {
         margin-top: 17px;
     }
     .service-row {
-        grid-template-columns: 34px 1fr 20px;
+        grid-template-columns: 34px 1fr;
         gap: 12px;
         padding-block: 16px;
     }
