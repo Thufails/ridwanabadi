@@ -31,6 +31,21 @@
 
         <div class="editor-layout">
             <form id="article-form" class="editor-form">
+                <section class="editor-panel editor-article-picker" aria-labelledby="article-picker-heading">
+                    <div class="editor-panel-heading">
+                        <span class="editor-step">00</span>
+                        <h2 id="article-picker-heading">Pilih artikel</h2>
+                    </div>
+                    <div class="editor-picker-row">
+                        <label class="editor-field" for="existing-article">Artikel yang akan dikelola
+                            <select id="existing-article" name="existingArticle">
+                                <option value="">Artikel baru</option>
+                            </select>
+                        </label>
+                        <button id="new-article" class="button button-outline editor-new-button" type="button">Tulis artikel baru</button>
+                    </div>
+                    <p class="editor-help">Pilih artikel untuk mengubah isi atau statusnya. Draf hanya tersimpan di arsip lokal dan tidak tampil di halaman publik.</p>
+                </section>
                 <section class="editor-panel" aria-labelledby="details-heading">
                     <div class="editor-panel-heading">
                         <span class="editor-step">01</span>
@@ -53,6 +68,12 @@
                         <label class="editor-field" for="article-tags">Tag
                             <input id="article-tags" name="tags" maxlength="240" placeholder="Bisnis, Marketing, Nutrisi Jiwa">
                             <small>Pisahkan beberapa tag dengan koma.</small>
+                        </label>
+                        <label class="editor-field" for="article-status-select">Status
+                            <select id="article-status-select" name="status">
+                                <option value="draft" selected>Draf — belum tampil di situs</option>
+                                <option value="published">Terbit — tampil di situs</option>
+                            </select>
                         </label>
                     </div>
                     <label class="editor-field editor-field-full" for="article-excerpt">Ringkasan

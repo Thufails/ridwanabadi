@@ -88,6 +88,27 @@
     padding: clamp(20px, 3vw, 32px);
 }
 
+.editor-picker-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 16px;
+}
+
+.editor-new-button {
+    min-height: 46px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+}
+
+.editor-new-button:hover,
+.editor-new-button:focus-visible {
+    border-color: var(--copper);
+    background: var(--paper-deep);
+}
+
 .editor-panel-heading {
     display: flex;
     align-items: baseline;
@@ -137,7 +158,8 @@
 }
 
 .editor-field input,
-.editor-field textarea {
+.editor-field textarea,
+.editor-field select {
     width: 100%;
     min-height: 46px;
     border: 1px solid var(--line);
@@ -157,10 +179,17 @@
 
 .editor-field input:focus,
 .editor-field textarea:focus,
+.editor-field select:focus,
 .editor-content:focus {
     border-color: var(--copper);
     outline: 2px solid color-mix(in srgb, var(--copper) 20%, transparent);
     outline-offset: 1px;
+}
+
+.editor-field input:read-only {
+    background: var(--paper-deep);
+    color: var(--ink-soft);
+    cursor: not-allowed;
 }
 
 .editor-field small,
@@ -415,6 +444,10 @@
     }
 
     .editor-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .editor-picker-row {
         grid-template-columns: 1fr;
     }
 

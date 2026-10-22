@@ -44,8 +44,18 @@
         <section class="article-browser" aria-label="Jelajahi artikel">
             <label class="article-search-label" for="article-search">Cari tulisan</label>
             <input id="article-search" class="article-search" type="search" placeholder="Ketik judul atau topik…" autocomplete="off">
-            <label class="article-filter-label" for="article-year">Tahun</label>
-            <select id="article-year" class="article-year"><option value="all">Semua tahun</option></select>
+            <div class="article-filter-field">
+                <label class="article-filter-label" for="article-year">Tahun</label>
+                <select id="article-year" class="article-filter"><option value="all">Semua tahun</option></select>
+            </div>
+            <div class="article-filter-field">
+                <label class="article-filter-label" for="article-category-filter">Kategori</label>
+                <select id="article-category-filter" class="article-filter"><option value="all">Semua kategori</option></select>
+            </div>
+            <div class="article-filter-field">
+                <label class="article-filter-label" for="article-tag-filter">Tag</label>
+                <select id="article-tag-filter" class="article-filter"><option value="all">Semua tag</option></select>
+            </div>
         </section>
 
         <p id="article-status" class="article-status" role="status" aria-live="polite">Memuat artikel…</p>

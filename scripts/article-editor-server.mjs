@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 
-const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const projectRoot = path.resolve(process.env.ARTICLE_EDITOR_ROOT || path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."));
 const archivePath = path.join(projectRoot, "data", "articles.json");
 const assetsPath = path.join(projectRoot, "assets", "articles");
 const host = "127.0.0.1";
@@ -49,7 +49,7 @@ async function readJsonBody(request) {
   }
 }
 
-function safeImage(dataUrl, slug) {
+function safeImage(dataUrl, slug, replaceExisting = false) {
   if (!dataUrl) return null;
   const match = /^data:image\/(jpeg|png|webp);base64,([a-z\d+/]+=*)$/i.exec(dataUrl);
   if (!match) throw Object.assign(new Error("Sampul harus berupa JPG, PNG, atau WebP."), { statusCode: 400 });
@@ -65,7 +65,8 @@ function safeImage(dataUrl, slug) {
   if (!signatures[type]) throw Object.assign(new Error("Isi file tidak cocok dengan format gambar."), { statusCode: 400 });
 
   const extension = type === "jpeg" ? "jpg" : type;
-  return { bytes, relativePath: `assets/articles/${slug}.${extension}` };
+  const suffix = replaceExisting ? `-${randomUUID().slice(0, 8)}` : "";
+  return { bytes, relativePath: `assets/articles/${slug}${suffix}.${extension}` };
 }
 
 async function saveArchive(archive) {
@@ -96,13 +97,18 @@ async function saveArticle(request, response) {
   let coverWritten = false;
   try {
     const payload = await readJsonBody(request);
+    if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+      return sendJson(response, 400, { error: "Data artikel tidak valid." });
+    }
     const title = String(payload.title || "").trim();
-    const slug = slugify(payload.slug || title);
+    const existingSlug = request.method === "PUT" ? request.existingArticleSlug : "";
+    const slug = existingSlug || slugify(payload.slug || title);
     const date = String(payload.date || "");
     const category = String(payload.category || "Artikel").trim().slice(0, 80) || "Artikel";
     const excerpt = String(payload.excerpt || "").replace(/\s+/g, " ").trim().slice(0, 320);
     const content = String(payload.content || "").trim();
     const tags = Array.isArray(payload.tags) ? payload.tags.map((tag) => String(tag).trim().slice(0, 60)).filter(Boolean).slice(0, 20) : [];
+    const status = String(payload.status || "published");
 
     if (!title || title.length > 180) return sendJson(response, 400, { error: "Judul wajib diisi (maksimal 180 karakter)." });
     if (!slug || slug.length > 180 || slug !== slugify(slug)) return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
@@ -111,50 +117,78 @@ async function saveArticle(request, response) {
       return sendJson(response, 400, { error: "Tanggal artikel tidak valid." });
     }
     if (!excerpt) return sendJson(response, 400, { error: "Ringkasan artikel belum tersedia." });
+    if (!["draft", "published"].includes(status)) return sendJson(response, 400, { error: "Status artikel tidak valid." });
     if (!content || content.replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/g, " ").trim().length < 1) {
       return sendJson(response, 400, { error: "Isi artikel wajib diisi." });
     }
 
     const archive = JSON.parse(await readFile(archivePath, "utf8"));
     if (!Array.isArray(archive.articles)) throw new Error("Arsip artikel tidak memiliki format yang benar.");
-    if (archive.articles.some((article) => article.slug?.toLowerCase() === slug.toLowerCase())) {
+    const existingArticle = existingSlug
+      ? archive.articles.find((article) => article.slug?.toLowerCase() === existingSlug.toLowerCase())
+      : null;
+    if (existingSlug && !existingArticle) return sendJson(response, 404, { error: "Artikel yang akan diubah tidak ditemukan." });
+    if (archive.articles.some((article) => article.slug?.toLowerCase() === slug.toLowerCase() && article !== existingArticle)) {
       return sendJson(response, 409, { error: "Alamat artikel ini sudah ada. Ubah slug agar tetap unik." });
     }
 
-    uploadedCover = safeImage(payload.coverDataUrl, slug);
+    uploadedCover = safeImage(payload.coverDataUrl, slug, Boolean(existingArticle));
     if (uploadedCover) {
       await mkdir(assetsPath, { recursive: true });
       await writeFile(path.join(projectRoot, uploadedCover.relativePath), uploadedCover.bytes, { flag: "wx" });
       coverWritten = true;
     }
 
-    const nextId = archive.articles.reduce((maximum, article) => Math.max(maximum, Number(article.id) || 0), 0) + 1;
     const article = {
-      id: nextId,
+      ...(existingArticle || {}),
+      id: existingArticle?.id ?? archive.articles.reduce((maximum, entry) => Math.max(maximum, Number(entry.id) || 0), 0) + 1,
       date: new Date(`${date}T12:00:00+07:00`).toISOString(),
       slug,
-      sourceType: "local",
-      sourceUrl: "",
+      sourceType: existingArticle?.sourceType || "local",
+      sourceUrl: existingArticle?.sourceUrl || "",
       title,
       excerpt,
       category,
       tags,
-      featuredImage: uploadedCover?.relativePath || null,
-      coverImage: uploadedCover?.relativePath || null,
+      status,
+      featuredImage: uploadedCover?.relativePath || (payload.removeCover ? null : existingArticle?.featuredImage || existingArticle?.coverImage || null),
+      coverImage: uploadedCover?.relativePath || (payload.removeCover ? null : existingArticle?.coverImage || existingArticle?.featuredImage || null),
       content
     };
 
-    archive.articles.push(article);
+    if (existingArticle) {
+      archive.articles[archive.articles.indexOf(existingArticle)] = article;
+    } else {
+      archive.articles.push(article);
+    }
     archive.articles.sort((left, right) => new Date(right.date) - new Date(left.date));
-    archive.total = archive.articles.length;
+    archive.total = archive.articles.filter((entry) => entry.status !== "draft").length;
     archive.updatedAt = new Date().toISOString();
     await saveArchive(archive);
-    return sendJson(response, 201, { ok: true, slug, coverImage: article.coverImage });
+    return sendJson(response, existingArticle ? 200 : 201, { ok: true, slug, status, coverImage: article.coverImage });
   } catch (error) {
     if (coverWritten && uploadedCover) await unlink(path.join(projectRoot, uploadedCover.relativePath)).catch(() => {});
     const statusCode = error.statusCode || 500;
     console.error(error);
     return sendJson(response, statusCode, { error: statusCode === 500 ? "Artikel tidak berhasil disimpan. Periksa arsip lokal dan coba lagi." : error.message });
+  }
+}
+
+async function listArticles(request, response) {
+  const requestHost = request.headers.host || "";
+  const origin = request.headers.origin;
+  if (!new Set([`${host}:${port}`, `localhost:${port}`]).has(requestHost)
+    || (origin && ![`http://${host}:${port}`, `http://localhost:${port}`].includes(origin))) {
+    return sendJson(response, 403, { error: "Endpoint hanya tersedia di editor lokal." });
+  }
+  try {
+    const archive = JSON.parse(await readFile(archivePath, "utf8"));
+    if (!Array.isArray(archive.articles)) throw new Error("Arsip artikel tidak memiliki format yang benar.");
+    const articles = archive.articles.sort((left, right) => new Date(right.date) - new Date(left.date));
+    return sendJson(response, 200, { articles });
+  } catch (error) {
+    console.error(error);
+    return sendJson(response, 500, { error: "Arsip lokal tidak dapat dibaca." });
   }
 }
 
@@ -188,7 +222,19 @@ async function serveStatic(request, response, pathname) {
 
 const server = createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://${host}:${port}`);
+  if (url.pathname === "/api/articles" && request.method === "GET") return listArticles(request, response);
   if (url.pathname === "/api/articles" && request.method === "POST") return saveArticle(request, response);
+  if (url.pathname.startsWith("/api/articles/") && request.method === "PUT") {
+    let slug;
+    try {
+      slug = decodeURIComponent(url.pathname.slice("/api/articles/".length));
+    } catch {
+      return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
+    }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
+    request.existingArticleSlug = slug;
+    return saveArticle(request, response);
+  }
   if (url.pathname.startsWith("/api/")) return sendJson(response, 404, { error: "Endpoint tidak ditemukan." });
   if (!new Set(["GET", "HEAD"]).has(request.method)) {
     response.writeHead(405, { allow: "GET, HEAD, POST" }).end("Method not allowed");

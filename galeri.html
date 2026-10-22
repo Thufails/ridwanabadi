@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/gallery.css">
     <script src="js/main.js" defer></script>
+    <script src="js/gallery.js" defer></script>
 </head>
 
 <body>
@@ -47,30 +48,47 @@
 
         <section class="gallery-collection section-wrap" aria-label="Semua foto dan dokumentasi">
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/kemenparekraf-program.jpg" alt="Dokumentasi kegiatan program kolaborasi Kemenparekraf" fetchpriority="high"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Program bersama Kemenparekraf RI"><img src="assets/kemenparekraf-program.jpg" alt="Dokumentasi kegiatan program kolaborasi Kemenparekraf" fetchpriority="high"></button>
                 <figcaption><span>Kolaborasi publik</span><h2>Program bersama Kemenparekraf RI</h2><p>Kolaborasi dalam program pemberdayaan dan penguatan usaha kreatif.</p></figcaption>
             </figure>
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/kemenparekraf-kegiatan.jpg" alt="Peserta mengikuti sesi kegiatan kolaborasi program Kemenparekraf" loading="lazy"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Belajar dan bertumbuh bersama"><img src="assets/kemenparekraf-kegiatan.jpg" alt="Peserta mengikuti sesi kegiatan kolaborasi program Kemenparekraf" loading="lazy"></button>
                 <figcaption><span>Program & kegiatan</span><h2>Belajar dan bertumbuh bersama</h2><p>Suasana kegiatan pengembangan kapasitas bersama para peserta.</p></figcaption>
             </figure>
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/program-mdp.jpeg" alt="Coach Ridwan memandu sesi pengembangan tim dalam program MDP" loading="lazy"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Program MDP"><img src="assets/program-mdp.jpeg" alt="Coach Ridwan memandu sesi pengembangan tim dalam program MDP" loading="lazy"></button>
                 <figcaption><span>Management Development</span><h2>Program MDP</h2><p>Penguatan kapasitas manajerial dan kesiapan tim untuk bertumbuh.</p></figcaption>
             </figure>
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/komunitas-bisnis.jpeg" alt="Pertemuan komunitas bisnis dalam ruang belajar bersama" loading="lazy"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Ruang belajar bersama"><img src="assets/komunitas-bisnis.jpeg" alt="Pertemuan komunitas bisnis dalam ruang belajar bersama" loading="lazy"></button>
                 <figcaption><span>Komunitas bisnis</span><h2>Ruang belajar bersama</h2><p>Berbagi pengalaman dan membangun jejaring dalam komunitas.</p></figcaption>
             </figure>
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/sukses-berkah-community.jpg" alt="Dokumentasi kegiatan Gebyar Wirausaha bersama Sukses Berkah Community" loading="lazy"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Sukses Berkah Community"><img src="assets/sukses-berkah-community.jpg" alt="Dokumentasi kegiatan Gebyar Wirausaha bersama Sukses Berkah Community" loading="lazy"></button>
                 <figcaption><span>Ekosistem wirausaha</span><h2>Sukses Berkah Community</h2><p>Ruang belajar, jejaring, dan penguatan semangat kewirausahaan.</p></figcaption>
             </figure>
             <figure class="gallery-card">
-                <div class="gallery-card-image"><img src="assets/seblak-asgar-grand-opening.jpg" alt="Momen Grand Opening Seblak Asgar bersama tiga orang di depan gerbang acara" loading="lazy"></div>
+                <button class="gallery-card-image" type="button" data-gallery-open aria-label="Lihat foto: Pembukaan Seblak Asgar"><img src="assets/seblak-asgar-grand-opening.jpg" alt="Momen Grand Opening Seblak Asgar bersama tiga orang di depan gerbang acara" loading="lazy"></button>
                 <figcaption><span>Perjalanan usaha</span><h2>Pembukaan Seblak Asgar</h2><p>Momen pembukaan usaha kuliner Seblak Asgar bersama tim.</p></figcaption>
             </figure>
         </section>
+
+        <dialog id="gallery-lightbox" class="gallery-lightbox" aria-label="Tampilan foto galeri">
+            <div class="gallery-lightbox-frame">
+                <button class="gallery-lightbox-close" type="button" data-lightbox-close aria-label="Tutup foto">×</button>
+                <button class="gallery-lightbox-nav gallery-lightbox-previous" type="button" data-lightbox-previous aria-label="Foto sebelumnya">‹</button>
+                <figure class="gallery-lightbox-figure">
+                    <img id="lightbox-image" alt="">
+                    <figcaption>
+                        <span id="lightbox-category"></span>
+                        <strong id="lightbox-title"></strong>
+                        <span id="lightbox-description"></span>
+                        <span id="lightbox-count" class="gallery-lightbox-count" aria-live="polite"></span>
+                    </figcaption>
+                </figure>
+                <button class="gallery-lightbox-nav gallery-lightbox-next" type="button" data-lightbox-next aria-label="Foto berikutnya">›</button>
+            </div>
+        </dialog>
 
         <section class="gallery-return section-wrap" aria-label="Kembali ke profil">
             <p>Setiap dokumentasi menyimpan cerita tentang proses dan orang-orang di dalamnya.</p>

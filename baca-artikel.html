@@ -35,15 +35,26 @@
         <nav class="article-breadcrumb" aria-label="Breadcrumb"><a href="index.html#top">Beranda</a><span aria-hidden="true">/</span><a href="artikel.html">Artikel</a><span aria-hidden="true">/</span><span id="detail-breadcrumb-title">Memuat tulisan</span></nav>
         <p id="detail-category" class="article-page-kicker"><span class="eyebrow-line"></span> Artikel</p>
         <h1 id="detail-title" class="article-detail-title">Memuat tulisan…</h1>
-        <p id="detail-meta" class="article-detail-meta"></p>
+        <p id="detail-meta" class="article-detail-meta"><span id="detail-date"></span><span id="detail-reading-time"></span></p>
         <img id="detail-cover" class="article-detail-cover" alt="" hidden>
         <div class="article-detail-layout">
             <article id="detail-content" class="article-content" aria-label="Isi artikel"></article>
             <aside class="article-aside">
+                <nav id="article-toc" class="article-toc" aria-label="Daftar isi" hidden>
+                    <h2>Di artikel ini</h2>
+                    <ol id="article-toc-list"></ol>
+                </nav>
                 <a class="text-link" href="artikel.html">Semua artikel <span aria-hidden="true">↗</span></a>
                 <p>Gagasan yang baik bukan hanya dibaca, tetapi juga dibawa ke dalam tindakan.</p>
             </aside>
         </div>
+        <section id="related-articles" class="related-articles" aria-labelledby="related-articles-title" hidden>
+            <div class="related-articles-heading">
+                <p class="article-page-kicker"><span class="eyebrow-line"></span> Lanjut membaca</p>
+                <h2 id="related-articles-title">Gagasan yang mungkin kamu suka.</h2>
+            </div>
+            <div id="related-articles-list" class="related-articles-list"></div>
+        </section>
         <nav class="article-pagination" aria-label="Navigasi artikel">
             <a id="article-previous" class="article-page-link" href="artikel.html" hidden><span>Artikel lebih baru</span><strong></strong></a>
             <a id="article-next" class="article-page-link article-page-link-next" href="artikel.html" hidden><span>Artikel lebih lama</span><strong></strong></a>

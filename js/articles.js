@@ -14,6 +14,12 @@
 
   const articleHref = (article) => `baca-artikel.html?slug=${encodeURIComponent(article.slug)}`;
 
+  function tagsFor(article) {
+    if (Array.isArray(article.tags) && article.tags.length) return article.tags.map((tag) => String(tag).trim()).filter(Boolean);
+    const plainText = new DOMParser().parseFromString(article.content || "", "text/html").body.textContent || "";
+    return [...new Set((plainText.match(/#[\p{L}\p{N}_-]{2,}/gu) || []).map((tag) => tag.replace(/^#/, "")))];
+  }
+
   function safeUrl(value, { image = false } = {}) {
     if (!value) return "";
     try {
@@ -223,7 +229,11 @@
       if (!response.ok) throw new Error(`Gagal memuat arsip (${response.status})`);
       const payload = await response.json();
       if (!Array.isArray(payload.articles) || payload.articles.length === 0) throw new Error("Belum ada artikel di arsip.");
-      return payload.articles.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const articles = payload.articles
+        .filter((article) => article.status !== "draft")
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+      articles.forEach((article) => { article.displayTags = tagsFor(article); });
+      return articles;
     } catch (error) {
       console.error(error);
       throw error;
@@ -235,6 +245,8 @@
     const status = document.querySelector("#article-status");
     const search = document.querySelector("#article-search");
     const yearFilter = document.querySelector("#article-year");
+    const categoryFilter = document.querySelector("#article-category-filter");
+    const tagFilter = document.querySelector("#article-tag-filter");
     const loadMore = document.querySelector("#article-load-more");
     const pageSize = 9;
     let visibleCount = pageSize;
@@ -243,13 +255,27 @@
       .sort((a, b) => Number(b) - Number(a))
       .forEach((year) => yearFilter.add(new Option(year, year)));
 
+    [...new Set(articles.map((article) => String(article.category || "Artikel").trim()).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "id"))
+      .forEach((category) => categoryFilter.add(new Option(category, category)));
+
+    [...new Set(articles.flatMap((article) => article.displayTags))]
+      .sort((a, b) => a.localeCompare(b, "id"))
+      .forEach((tag) => tagFilter.add(new Option(tag, tag)));
+
     function render() {
       const query = search.value.trim().toLocaleLowerCase("id-ID");
       const selectedYear = yearFilter.value;
+      const selectedCategory = categoryFilter.value;
+      const selectedTag = tagFilter.value.toLocaleLowerCase("id-ID");
       const matches = articles.filter((article) => {
-        const text = `${article.title} ${article.excerpt} ${article.category} ${(article.tags || []).join(" ")}`.toLocaleLowerCase("id-ID");
+        const tags = article.displayTags;
+        const text = `${article.title} ${article.excerpt} ${article.category} ${tags.join(" ")}`.toLocaleLowerCase("id-ID");
         const articleYear = String(new Date(article.date).getFullYear());
-        return (!query || text.includes(query)) && (selectedYear === "all" || selectedYear === articleYear);
+        return (!query || text.includes(query))
+          && (selectedYear === "all" || selectedYear === articleYear)
+          && (selectedCategory === "all" || article.category === selectedCategory)
+          && (selectedTag === "all" || tags.some((tag) => String(tag).toLocaleLowerCase("id-ID") === selectedTag));
       });
       const shown = matches.slice(0, visibleCount);
       list.replaceChildren(...shown.map(buildCard));
@@ -259,8 +285,96 @@
 
     search.addEventListener("input", () => { visibleCount = pageSize; render(); });
     yearFilter.addEventListener("change", () => { visibleCount = pageSize; render(); });
+    categoryFilter.addEventListener("change", () => { visibleCount = pageSize; render(); });
+    tagFilter.addEventListener("change", () => { visibleCount = pageSize; render(); });
     loadMore.addEventListener("click", () => { visibleCount += pageSize; render(); });
     render();
+  }
+
+  function slugifyHeading(value) {
+    return String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("id-ID")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "bagian";
+  }
+
+  function createTableOfContents(content) {
+    const toc = document.querySelector("#article-toc");
+    const list = document.querySelector("#article-toc-list");
+    const headings = [...content.querySelectorAll("h2, h3")].filter((heading) => heading.textContent.trim());
+    if (headings.length < 3) {
+      const boldParagraphs = [...content.querySelectorAll("p")].filter((paragraph) => {
+        const children = [...paragraph.childNodes].filter((node) => node.nodeType !== Node.TEXT_NODE || node.textContent.trim());
+        if (children.length !== 1 || children[0].nodeType !== Node.ELEMENT_NODE || !["STRONG", "B"].includes(children[0].tagName)) return false;
+        const text = paragraph.textContent.trim();
+        return text.length >= 4 && text.length <= 90 && !/[.:;]$/.test(text);
+      });
+      for (const paragraph of boldParagraphs) {
+        paragraph.classList.add("article-toc-derived-heading");
+        headings.push(paragraph);
+      }
+    }
+    if (headings.length < 3) return;
+
+    const usedIds = new Set();
+    for (const heading of headings) {
+      const baseId = slugifyHeading(heading.textContent);
+      let id = baseId;
+      let suffix = 2;
+      while (usedIds.has(id) || document.getElementById(id)) id = `${baseId}-${suffix++}`;
+      usedIds.add(id);
+      heading.id = id;
+
+      const item = document.createElement("li");
+      if (heading.tagName === "H3") item.className = "article-toc-subitem";
+      const link = document.createElement("a");
+      link.href = `#${id}`;
+      link.textContent = heading.textContent.trim();
+      item.append(link);
+      list.append(item);
+    }
+    toc.hidden = false;
+  }
+
+  function readingTime(content) {
+    const words = (content.textContent || "").trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(1, Math.ceil(words / 200));
+  }
+
+  function buildRelatedCard(article, index) {
+    const card = document.createElement("article");
+    card.className = "related-article-card";
+    const href = articleHref(article);
+    const cover = safeUrl(article.coverImage || article.featuredImage, { image: true });
+    card.innerHTML = `${cover ? `<a class="related-article-image" href="${escapeHtml(href)}" tabindex="-1" aria-hidden="true"><img src="${escapeHtml(cover)}" alt="" loading="lazy" decoding="async"></a>` : ""}
+      <p class="archive-card-meta"><span>${escapeHtml(article.category || "Artikel")}</span><span>${escapeHtml(formatDate(article.date))}</span></p>
+      <h3><a href="${escapeHtml(href)}">${escapeHtml(article.title || "Tanpa judul")}</a></h3>
+      <p>${escapeHtml(article.excerpt || "Baca gagasan lengkap dari Coach Ridwan Abadi.")}</p>
+      <a class="archive-card-link" href="${escapeHtml(href)}">Baca artikel <span aria-hidden="true">↗</span></a>`;
+    card.style.setProperty("--card-order", String(index));
+    return card;
+  }
+
+  function showRelatedArticles(article, articles) {
+    const section = document.querySelector("#related-articles");
+    const list = document.querySelector("#related-articles-list");
+    const articleTags = new Set(article.displayTags.map((tag) => String(tag).toLocaleLowerCase("id-ID")));
+    const related = articles
+      .filter((entry) => entry.slug !== article.slug)
+      .map((entry) => {
+        const sharedTags = entry.displayTags
+          .filter((tag) => articleTags.has(String(tag).toLocaleLowerCase("id-ID"))).length;
+        const sameCategory = Boolean(article.category && entry.category === article.category);
+        return { entry, score: sharedTags * 3 + (sameCategory ? 1 : 0) };
+      })
+      .sort((a, b) => b.score - a.score || new Date(b.entry.date) - new Date(a.entry.date))
+      .slice(0, 3)
+      .map(({ entry }) => entry);
+    if (!related.length) return;
+    list.replaceChildren(...related.map(buildRelatedCard));
+    section.hidden = false;
   }
 
   function initDetail(articles) {
@@ -280,7 +394,7 @@
     document.querySelector("#detail-category").innerHTML = `<span class="eyebrow-line"></span> ${escapeHtml(article.category || "Artikel")}`;
     document.querySelector("#detail-title").textContent = article.title;
     document.querySelector("#detail-breadcrumb-title").textContent = article.title;
-    document.querySelector("#detail-meta").textContent = formatDate(article.date);
+    document.querySelector("#detail-date").textContent = formatDate(article.date);
     const cover = document.querySelector("#detail-cover");
     const coverUrl = safeUrl(article.featuredImage || article.coverImage, { image: true });
     if (coverUrl) {
@@ -288,12 +402,17 @@
       cover.alt = article.title;
       cover.hidden = false;
     }
-    document.querySelector("#detail-content").append(sanitizeContent(
+    const content = document.querySelector("#detail-content");
+    content.append(sanitizeContent(
       article.content,
       articles,
       article.featuredImage || article.coverImage,
       Boolean(article.sourceUrl)
     ));
+    const minutes = readingTime(content);
+    document.querySelector("#detail-reading-time").textContent = `${minutes} menit baca`;
+    createTableOfContents(content);
+    showRelatedArticles(article, articles);
 
     const position = articles.findIndex((entry) => entry.slug === article.slug);
     const newer = articles[position - 1];
