@@ -18,6 +18,9 @@
     const coverFile = document.getElementById("coverFile");
     const coverPreview = document.getElementById("coverPreview");
     const previewDialog = document.getElementById("previewDialog");
+    const localStorageKey = "ridwan-abadi-local-articles-v1";
+    const localPreviewMode = new URLSearchParams(window.location.search).get("local") === "1"
+        && ["localhost", "127.0.0.1"].includes(window.location.hostname);
     let activeDraftKey = "";
     let coverObjectUrl = "";
     let currentCoverImage = "";
@@ -28,6 +31,13 @@
 
     function readDrafts() {
         return Object.fromEntries(articleCatalog.filter(function (article) { return article.status === "draft"; }).map(function (article) { return [article.slug, article]; }));
+    }
+
+    function readLocalArticles() {
+        try {
+            const value = JSON.parse(localStorage.getItem(localStorageKey) || "[]");
+            return Array.isArray(value) ? value : [];
+        } catch (error) { return []; }
     }
 
     function showMessage(message, type) {
@@ -180,7 +190,7 @@
         slugWasEdited = true;
         updateWordCount();
         renderDraftList();
-        showMessage("Draf dimuat dari penyimpanan Cloudflare.", "success");
+        showMessage(localPreviewMode ? "Draf dimuat dari penyimpanan lokal browser ini." : "Draf dimuat dari penyimpanan Cloudflare.", "success");
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -195,6 +205,13 @@
         if (!window.confirm(message)) return;
 
         try {
+            if (localPreviewMode) {
+                localStorage.setItem(localStorageKey, JSON.stringify(readLocalArticles().filter(function (article) { return article.slug !== key; })));
+                if (key === activeDraftKey) resetForm();
+                await refreshArticleCatalog();
+                showMessage("Draf lokal berhasil dihapus.", "success");
+                return;
+            }
             const response = await fetch("/api/admin/articles/" + encodeURIComponent(key), { method: "DELETE", credentials: "same-origin" });
             const result = await response.json();
             if (!response.ok) throw new Error(result.error || "Draf gagal dihapus.");
@@ -266,9 +283,34 @@
         }
         const saveButton = status === "published" ? document.getElementById("publishButton") : document.getElementById("saveDraftButton");
         saveButton.disabled = true;
-        showMessage(status === "published" ? "Menerbitkan artikel…" : "Menyimpan draf ke Cloudflare…");
+        showMessage(localPreviewMode
+            ? (status === "published" ? "Menerbitkan ke arsip lokal browser ini…" : "Menyimpan draf di browser ini…")
+            : (status === "published" ? "Menerbitkan artikel…" : "Menyimpan draf ke Cloudflare…"));
         try {
             const selectedCover = coverFile.files && coverFile.files[0];
+            if (localPreviewMode) {
+                if (selectedCover) {
+                    if (selectedCover.size > 1024 * 1024) throw new Error("Foto sampul untuk mode lokal maksimal 1 MB agar muat di penyimpanan browser.");
+                    currentCoverImage = await fileAsDataUrl(selectedCover);
+                }
+                article.coverImage = currentCoverImage;
+                article.featuredImage = currentCoverImage;
+                const localArticles = readLocalArticles();
+                const existingIndex = localArticles.findIndex(function (entry) { return entry.slug === (activeDraftKey || article.slug); });
+                if (existingIndex >= 0) localArticles[existingIndex] = article;
+                else localArticles.push(article);
+                localStorage.setItem(localStorageKey, JSON.stringify(localArticles));
+                activeDraftKey = status === "draft" ? article.slug : "";
+                coverFile.value = "";
+                await refreshArticleCatalog();
+                if (status === "published") {
+                    resetForm();
+                    showMessage("Artikel terbit di arsip lokal browser ini saja. Situs produksi belum berubah.", "success");
+                } else {
+                    showMessage("Draf tersimpan di browser lokal ini saja.", "success");
+                }
+                return;
+            }
             if (selectedCover) {
                 if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
                     article.coverDataUrl = await fileAsDataUrl(selectedCover);
@@ -311,6 +353,16 @@
     function publishArticle() { return saveArticle("published"); }
 
     async function refreshArticleCatalog() {
+        if (localPreviewMode) {
+            const staticResponse = await fetch("../data/articles.json", { cache: "no-store" });
+            if (!staticResponse.ok) throw new Error("Arsip artikel lokal tidak dapat dibaca.");
+            const staticArchive = await staticResponse.json();
+            staticArticleSlugs = new Set((staticArchive.articles || []).filter(function (article) { return article.status !== "draft"; }).map(function (article) { return article.slug; }));
+            articleCatalog = readLocalArticles();
+            catalogReady = true;
+            renderDraftList();
+            return;
+        }
         const [response, staticResponse] = await Promise.all([
             fetch("/api/admin/articles", { credentials: "same-origin", cache: "no-store", headers: { Accept: "application/json" } }),
             fetch("../data/articles.json", { cache: "no-store" }),
@@ -555,6 +607,10 @@
     setToday();
     renderDraftList();
     updateWordCount();
+    if (localPreviewMode) {
+        document.getElementById("logoutButton").hidden = true;
+        document.getElementById("adminFooter").textContent = "Mode lokal: draf dan artikel terbit hanya tersimpan di browser ini. Perubahan tidak mengubah berkas situs atau versi Production.";
+    }
     refreshArticleCatalog().catch(function (error) {
         showMessage(error.message || "Tidak dapat memuat artikel dari Cloudflare.", "error");
     });

@@ -3,11 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="robots" content="noindex,nofollow">
-  <meta http-equiv="refresh" content="0;url=/admin/login.html">
-  <title>Masuk ke Ruang Artikel</title>
+  <title>Kelola Artikel</title>
 </head>
 <body>
-  <p>Membuka <a href="/admin/login.html">login admin artikel</a>…</p>
-  <script>window.location.replace("/admin/login.html");</script>
+  <p>Membuka ruang artikel… Jika tidak berpindah, <a id="editorLink" href="admin/index.html?local=1">lanjutkan di sini</a>.</p>
+  <script>
+    const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    const destination = isLocal ? "admin/index.html?local=1" : "/admin/login.html";
+    document.getElementById("editorLink").href = destination;
+    window.location.replace(destination);
+  </script>
 </body>
 </html>

@@ -22,6 +22,8 @@
 
   function safeUrl(value, { image = false } = {}) {
     if (!value) return "";
+    if (image && ["localhost", "127.0.0.1"].includes(window.location.hostname)
+      && /^data:image\/(?:jpeg|png|webp);base64,/i.test(String(value))) return String(value);
     try {
       const url = new URL(value, window.location.href);
       if (["http:", "https:"].includes(url.protocol)) {
@@ -238,6 +240,14 @@
         }
       } catch {
         // Keep the static article archive available when the live API is not configured.
+      }
+      if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+        try {
+          const localArticles = JSON.parse(localStorage.getItem("ridwan-abadi-local-articles-v1") || "[]");
+          if (Array.isArray(localArticles)) for (const article of localArticles) bySlug.set(article.slug, article);
+        } catch {
+          // Ignore invalid local drafts and keep the normal archive available.
+        }
       }
       const articles = [...bySlug.values()]
         .filter((article) => article.status !== "draft")

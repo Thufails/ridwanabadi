@@ -41,9 +41,11 @@ Proyek Pages menggunakan build command `npm run build:cloudflare` dan output dir
 - Gunakan **Pratinjau** sebelum menyimpan. **Simpan draf** menyimpan ke D1 dan bisa dibuka kembali dari perangkat lain. **Terbitkan** menampilkan artikel di arsip publik tanpa perlu mengedit `articles.json` atau deploy ulang.
 - Artikel lama yang sudah ada di `data/articles.json` tetap tampil di situs. Editor admin dipakai untuk artikel baru dan draf yang dibuat lewat ruang admin.
 
-## Pengembangan lokal
+## Pengembangan lokal dengan Live Server
 
-Jalankan `npm run dev:local`, lalu buka `http://127.0.0.1:4174/admin/login.html`. Server lokal membaca kredensial dari `.dev.vars`, menyimpan artikel ke `data/articles.json`, dan menyimpan sampul di `assets/articles/`. File `.dev.vars` diabaikan Git; jangan commit atau pakai nilai lokal sebagai kredensial Production. Live Server biasa tidak menjalankan login/API ini.
+Jalankan Live Server pada folder situs, lalu buka `http://127.0.0.1:5501/kelola-artikel.html`. Di `localhost` atau `127.0.0.1`, halaman tersebut langsung membuka editor tanpa login. Artikel dan draf lokal disimpan di `localStorage` browser yang sama; data ini hanya untuk pratinjau dan tidak mengubah `data/articles.json` atau situs Production. Sampul lokal dibatasi 1 MB agar muat di penyimpanan browser.
+
+Untuk login admin Production dan menerbitkan artikel agar dapat dilihat publik, buka `/admin/login.html` pada situs Cloudflare. Login/API Production tetap membutuhkan pengaturan Cloudflare pada bagian di atas.
 
 ## Penyimpanan dan keamanan
 
