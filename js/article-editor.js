@@ -217,11 +217,11 @@
 
   function refreshSaveButton() {
     if (articleStatusInput.value === "draft") {
-      saveButton.innerHTML = "Simpan draf <span aria-hidden=\"true\">→</span>";
+      saveButton.textContent = "Simpan draf";
     } else if (editingSlug) {
-      saveButton.innerHTML = "Simpan perubahan <span aria-hidden=\"true\">→</span>";
+      saveButton.textContent = "Simpan perubahan";
     } else {
-      saveButton.innerHTML = "Terbitkan artikel <span aria-hidden=\"true\">→</span>";
+      saveButton.textContent = "Terbitkan artikel";
     }
   }
 
@@ -457,7 +457,7 @@
         const viewLink = document.createElement("a");
         viewLink.href = `baca-artikel.html?slug=${encodeURIComponent(result.slug)}`;
         viewLink.className = "text-link";
-        viewLink.textContent = "Lihat artikel →";
+        viewLink.textContent = "Lihat artikel";
         viewLink.target = "_blank";
         viewLink.rel = "noopener noreferrer";
         viewLink.id = "saved-article-link";
