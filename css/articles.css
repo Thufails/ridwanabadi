@@ -322,7 +322,7 @@ body[data-article-page="archive"] .article-page {
 
 .article-content {
     min-width: 0;
-    color: #28334d;
+    color: var(--ink-soft);
     font-size: 19px;
     line-height: 1.76;
     overflow-wrap: break-word;
@@ -680,6 +680,11 @@ body[data-article-page="archive"] .article-page {
 .article-page-link:focus-visible::after {
     color: var(--forest);
     transform: translate(3px, -50%);
+}
+
+.article-page-link:not(.article-page-link-next):hover::after,
+.article-page-link:not(.article-page-link-next):focus-visible::after {
+    transform: translate(-3px, -50%);
 }
 
 .article-page-link:hover strong,

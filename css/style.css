@@ -4,12 +4,12 @@
     --paper-deep: #f3f5fb;
     --ink: #17213b;
     --ink-soft: #4b5874;
-    --forest: #2437cf;
-    --forest-deep: #18265f;
+    --forest: #173b73;
+    --forest-deep: #10294f;
     --copper: #e87928;
     --line: rgba(23, 33, 59, .17);
-    --serif: "Aptos", "Segoe UI", Arial, sans-serif;
-    --sans: "Aptos", "Segoe UI", Arial, sans-serif;
+    --serif: "Segoe UI Variable Display", "Aptos Display", "Segoe UI", sans-serif;
+    --sans: "Segoe UI Variable Text", "Aptos", "Segoe UI", sans-serif;
     --page: 1240px;
 }
 
@@ -28,7 +28,7 @@ body {
     background: var(--paper);
     color: var(--ink);
     font-family: var(--sans);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
 }
@@ -947,8 +947,7 @@ h2 em {
 .article-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    border-top: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    column-gap: 24px;
 }
 
 .article-card {
@@ -956,8 +955,8 @@ h2 em {
     display: flex;
     min-height: 250px;
     flex-direction: column;
-    padding: 22px 22px 20px;
-    border-right: 1px solid var(--line);
+    padding: 22px 0 20px;
+    border-right: 0;
     transition: background .25s ease;
 }
 
@@ -983,11 +982,15 @@ h2 em {
 }
 
 .article-card:first-child {
-    padding-left: 22px;
+    padding-left: 0;
 }
 
 .article-card:last-child {
     border-right: 0;
+}
+
+.article-card + .article-card {
+    border-left: 0;
 }
 
 .article-card:hover {
@@ -1023,7 +1026,7 @@ h2 em {
     min-height: calc(1.14em * 3);
     margin-bottom: 10px;
     font-family: var(--serif);
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 400;
     line-height: 1.14;
 }
@@ -1032,7 +1035,7 @@ h2 em {
     max-width: 360px;
     margin-bottom: 25px;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.65;
 }
 
@@ -1142,7 +1145,7 @@ h2 em {
     max-width: 420px;
     margin-bottom: 25px;
     color: rgba(255, 255, 255, .7);
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .button-light {
@@ -1554,11 +1557,8 @@ h2 em {
     .article-card,
     .article-card:first-child {
         min-height: 230px;
-        padding: 25px 4px;
+        padding: 25px 0;
         border-right: 0;
-        border-bottom: 1px solid var(--line);
-    }
-    .article-card:last-child {
         border-bottom: 0;
     }
     .article-number {
@@ -1566,7 +1566,7 @@ h2 em {
     }
     .article-card h3 {
         min-height: 0;
-        font-size: 25px;
+        font-size: 26px;
     }
     .book-feature {
         grid-template-columns: 1fr;

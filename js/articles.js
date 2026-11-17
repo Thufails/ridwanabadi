@@ -218,7 +218,7 @@
       <p class="archive-card-meta"><span>${escapeHtml(article.category || "Artikel")}</span><span>${escapeHtml(formatDate(article.date))}</span></p>
       <h2><a href="${escapeHtml(href)}">${escapeHtml(article.title || "Tanpa judul")}</a></h2>
       <p class="archive-card-excerpt">${escapeHtml(article.excerpt || "Baca catatan dan gagasan lengkap dari Coach Ridwan Abadi.")}</p>
-      <a class="archive-card-link" href="${escapeHtml(href)}">Baca artikel <span aria-hidden="true">↗</span></a>`;
+      <a class="archive-card-link" href="${escapeHtml(href)}">Baca artikel <span aria-hidden="true">→</span></a>`;
     card.style.setProperty("--card-order", String(index));
     return card;
   }
@@ -352,7 +352,7 @@
       <p class="archive-card-meta"><span>${escapeHtml(article.category || "Artikel")}</span><span>${escapeHtml(formatDate(article.date))}</span></p>
       <h3><a href="${escapeHtml(href)}">${escapeHtml(article.title || "Tanpa judul")}</a></h3>
       <p>${escapeHtml(article.excerpt || "Baca gagasan lengkap dari Coach Ridwan Abadi.")}</p>
-      <a class="archive-card-link" href="${escapeHtml(href)}">Baca artikel <span aria-hidden="true">↗</span></a>`;
+      <a class="archive-card-link" href="${escapeHtml(href)}">Baca artikel <span aria-hidden="true">→</span></a>`;
     card.style.setProperty("--card-order", String(index));
     return card;
   }
