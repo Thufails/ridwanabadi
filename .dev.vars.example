@@ -1,0 +1,3 @@
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=isi-password-lokal-minimal-8-karakter
+ADMIN_SESSION_SECRET=buat-kunci-acak-32-byte-dan-jangan-commit

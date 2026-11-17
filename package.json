@@ -1,0 +1,8 @@
+{
+  "name": "ridwan-abadi-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:cloudflare": "node scripts/package-cloudflare.mjs"
+  }
+}

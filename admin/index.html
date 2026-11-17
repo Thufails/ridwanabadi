@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="theme-color" content="#17213b">
+    <title>Ruang Artikel | Ridwan Abadi</title>
+    <link rel="stylesheet" href="admin.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/mammoth@1.10.0/mammoth.browser.js"></script>
+    <script defer src="https://unpkg.com/docx@9.15.3/dist/index.iife.js"></script>
+    <script defer src="admin.js"></script>
+</head>
+<body>
+    <header class="admin-topbar">
+        <a class="admin-brand" href="../artikel.html" aria-label="Kembali ke artikel Ridwan Abadi">
+            <span class="admin-brand-mark">RA</span>
+            <span>Ruang Artikel</span>
+        </a>
+        <div class="topbar-actions">
+            <a class="back-link" href="../artikel.html">Lihat situs publik</a>
+            <button type="button" class="logout-button" id="logoutButton">Keluar</button>
+        </div>
+    </header>
+
+    <main class="admin-shell">
+        <section class="page-heading">
+            <div>
+                <p class="eyebrow">PENGELOLAAN KONTEN</p>
+                <h1>Tulis dan siapkan artikel</h1>
+                <p class="page-description">Impor naskah Word, rapikan di editor, lalu lihat pratinjaunya sebelum diterbitkan.</p>
+            </div>
+        </section>
+
+        <section class="workspace" aria-label="Editor artikel">
+            <div class="editor-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="step-label">01 / NASKAH</p>
+                        <h2>Isi artikel</h2>
+                    </div>
+                    <div class="file-actions">
+                        <button type="button" class="button button-quiet import-button" id="downloadTemplateButton">Unduh template</button>
+                        <label class="button button-outline import-button" for="wordFile">Impor Word</label>
+                    </div>
+                    <input id="wordFile" class="visually-hidden" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                </div>
+                <p class="helper-text">Gunakan template Word: judul memakai gaya <b>Title</b>, subjudul memakai <b>Heading 1</b>, isi memakai <b>Normal</b>.</p>
+
+                <div class="metadata-grid">
+                    <label class="field field-wide">
+                        <span>Judul artikel <i>*</i></span>
+                        <input id="articleTitle" type="text" maxlength="120" placeholder="Contoh: Membangun Tim yang Produktif" required>
+                    </label>
+                    <label class="field">
+                        <span>Slug URL <i>*</i></span>
+                        <input id="articleSlug" type="text" placeholder="membangun-tim-produktif" required>
+                    </label>
+                    <label class="field">
+                        <span>Kategori <i>*</i></span>
+                        <input id="articleCategory" type="text" placeholder="Pengembangan SDM" required>
+                    </label>
+                    <label class="field">
+                        <span>Tanggal artikel <i>*</i></span>
+                        <input id="articleDate" type="date" required>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Ringkasan</span>
+                        <textarea id="articleSummary" rows="2" maxlength="240" placeholder="Ringkasan pendek yang tampil di kartu artikel"></textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Deskripsi pencarian</span>
+                        <textarea id="articleDescription" rows="2" maxlength="200" placeholder="Deskripsi singkat untuk mesin pencari"></textarea>
+                    </label>
+                    <label class="field field-wide">
+                        <span>Kata kunci artikel terkait</span>
+                        <input id="articleTopics" type="text" placeholder="kepemimpinan, pengembangan-tim">
+                    </label>
+                    <label class="field field-wide cover-field">
+                        <span>Foto sampul</span>
+                        <input id="coverFile" type="file" accept="image/png,image/jpeg,image/webp">
+                        <small>Pilih JPG, PNG, atau WebP. Foto akan tampil di pratinjau.</small>
+                        <img id="coverPreview" alt="Pratinjau foto sampul" hidden>
+                    </label>
+                </div>
+
+                <div class="editor-heading">
+                    <div>
+                        <span>Isi naskah <i>*</i></span>
+                        <small>Heading 2 pada editor menjadi subjudul artikel.</small>
+                    </div>
+                    <span id="wordCount" class="word-count">0 kata</span>
+                </div>
+
+                <div class="rich-editor">
+                    <div class="editor-toolbar" role="toolbar" aria-label="Pemformatan artikel">
+                        <button type="button" data-command="formatBlock" data-value="p" aria-label="Paragraf" title="Paragraf">Paragraf</button>
+                        <button type="button" data-command="formatBlock" data-value="h2" aria-label="Subjudul" title="Subjudul">H2</button>
+                        <span class="toolbar-divider"></span>
+                        <button type="button" data-command="bold" aria-label="Tebal" title="Tebal"><b>B</b></button>
+                        <button type="button" data-command="italic" aria-label="Miring" title="Miring"><i>I</i></button>
+                        <button type="button" data-command="insertUnorderedList" aria-label="Daftar berpoin" title="Daftar berpoin">• Daftar</button>
+                        <button type="button" data-command="insertOrderedList" aria-label="Daftar bernomor" title="Daftar bernomor">1. Daftar</button>
+                        <button type="button" data-command="formatBlock" data-value="blockquote" aria-label="Kutipan" title="Kutipan">Kutipan</button>
+                        <button type="button" data-command="removeFormat" aria-label="Hapus pemformatan" title="Hapus pemformatan">Bersihkan</button>
+                    </div>
+                    <div id="articleBody" class="article-body-editor" contenteditable="true" role="textbox" aria-label="Isi artikel" aria-multiline="true" data-placeholder="Mulai menulis artikel atau impor naskah Word..."></div>
+                </div>
+                <p class="editor-message" id="editorMessage" role="status" aria-live="polite"></p>
+
+                <div class="action-row">
+                    <button type="button" class="button button-quiet" id="newArticleButton">Artikel baru</button>
+                    <div class="action-group">
+                        <button type="button" class="button button-outline" id="previewButton">Pratinjau</button>
+                        <button type="button" class="button button-outline" id="exportWordButton">Ekspor Word</button>
+                        <button type="button" class="button button-primary" id="saveDraftButton">Simpan draf</button>
+                        <button type="button" class="button button-publish" id="publishButton">Terbitkan</button>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="draft-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="step-label">02 / DRAF</p>
+                        <h2>Draf tersimpan</h2>
+                    </div>
+                    <span id="draftCount" class="draft-count">0</span>
+                </div>
+                <p class="helper-text">Artikel yang sudah disimpan.</p>
+                <div id="draftList" class="draft-list">
+                    <p class="empty-drafts">Belum ada draf tersimpan.</p>
+                </div>
+                <button type="button" id="downloadJsonButton" class="text-button">Unduh draf JSON (cadangan)</button>
+            </aside>
+        </section>
+    </main>
+
+    <footer class="admin-footer">
+        <p>Artikel dan draf tersimpan di Cloudflare. Pastikan status artikel sudah benar sebelum menerbitkannya.</p>
+    </footer>
+
+    <dialog id="previewDialog" class="preview-dialog">
+        <div class="preview-topbar">
+            <div><span class="step-label">PRATINJAU ARTIKEL</span><h2 id="previewTitleBar">Artikel baru</h2></div>
+            <button type="button" class="close-preview" id="closePreviewButton" aria-label="Tutup pratinjau">Tutup</button>
+        </div>
+        <article class="preview-article">
+            <span class="preview-category" id="previewCategory"></span>
+            <h1 id="previewTitle"></h1>
+            <p class="preview-summary" id="previewSummary"></p>
+            <img id="previewCover" alt="" hidden>
+            <div id="previewBody" class="preview-body"></div>
+        </article>
+    </dialog>
+</body>
+</html>

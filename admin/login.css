@@ -1,0 +1,120 @@
+:root {
+    color-scheme: light;
+    font-family: "Segoe UI Variable Text", Aptos, "Segoe UI", Arial, sans-serif;
+    color: #172b3f;
+    background: #fcfaf6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background:
+        radial-gradient(ellipse at 50% 0, rgba(27, 79, 125, .12), transparent 52%),
+        #fcfaf6;
+}
+
+.login-shell {
+    display: grid;
+    min-height: 100vh;
+    align-content: center;
+    justify-items: center;
+    gap: 26px;
+    padding: 36px 20px;
+}
+
+.login-brand { display: flex; align-items: center; gap: 14px; color: #17213b; text-decoration: none; }
+.login-brand-mark { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid #17213b; border-radius: 50%; font-size: 16px; }
+.login-brand-name { font-size: 14px; font-weight: 800; letter-spacing: .1em; }
+.login-brand-name small { display: block; margin-top: 3px; color: #4b5874; font-size: 10px; font-weight: 600; letter-spacing: .12em; }
+
+.login-card {
+    width: min(100%, 470px);
+    padding: clamp(26px, 6vw, 42px);
+    border: 1px solid #e4dcce;
+    border-radius: 20px 20px 20px 6px;
+    background: #fff;
+    box-shadow: 0 20px 56px rgba(11, 43, 77, .1);
+}
+
+.login-eyebrow {
+    margin: 0 0 12px;
+    color: #9d4f0a;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+.login-card h1 {
+    margin: 0;
+    color: #0b2b4d;
+    font-size: clamp(27px, 5vw, 35px);
+    letter-spacing: -.04em;
+    line-height: 1.15;
+}
+
+.login-description { margin: 12px 0 28px; color: #596b7f; font-size: 16px; line-height: 1.6; }
+.login-card form { display: grid; gap: 9px; }
+.login-card label { margin-top: 8px; color: #0b2b4d; font-size: 14px; font-weight: 750; }
+.login-card input {
+    width: 100%;
+    min-height: 48px;
+    padding: 11px 13px;
+    border: 1px solid #e4dcce;
+    border-radius: 10px 10px 10px 3px;
+    outline: none;
+    color: #172b3f;
+    background: #fff;
+    font: inherit;
+}
+
+.password-field { position: relative; }
+.password-field input { padding-right: 54px; }
+.login-card .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: grid;
+    width: 38px;
+    min-height: 38px;
+    margin: 0;
+    padding: 8px;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 8px;
+    color: #596b7f;
+    background: transparent;
+    cursor: pointer;
+}
+.login-card .password-toggle:hover { color: #0b2b4d; background: #f4f1eb; }
+.login-card .password-toggle:focus-visible { outline: 2px solid #d88a22; outline-offset: 1px; }
+.eye-icon { display: block; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.eye-closed { display: none; }
+.password-toggle[aria-pressed="true"] .eye-open { display: none; }
+.password-toggle[aria-pressed="true"] .eye-closed { display: block; }
+
+.login-card input:focus { border-color: #d88a22; box-shadow: 0 0 0 3px rgba(243, 148, 34, .16); }
+.login-card button {
+    min-height: 49px;
+    margin-top: 4px;
+    border: 0;
+    border-radius: 11px 11px 11px 4px;
+    color: #0b2b4d;
+    background: #f39422;
+    font: inherit;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.login-card button:hover:not(:disabled) { background: #ffab37; }
+.login-card button:disabled { opacity: .65; cursor: wait; }
+.login-card #togglePassword { min-height: 38px; margin: 0; padding: 8px; background: transparent; }
+.login-message { min-height: 22px; margin: 3px 0; color: #a33c27; font-size: 14px; line-height: 1.5; }
+.login-message.is-info { color: #596b7f; }
+.public-link { display: inline-block; margin-top: 23px; color: #1b4f7d; font-size: 14px; font-weight: 700; text-decoration: none; }
+.public-link:hover { color: #9d4f0a; }
+.login-footnote { margin: 0; color: #718090; font-size: 13px; text-align: center; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }

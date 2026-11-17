@@ -225,11 +225,21 @@
 
   async function loadArticles() {
     try {
-      const response = await fetch("data/articles.json", { headers: { accept: "application/json" } });
+      const response = await fetch("data/articles.json", { headers: { accept: "application/json" }, cache: "no-store" });
       if (!response.ok) throw new Error(`Gagal memuat arsip (${response.status})`);
       const payload = await response.json();
       if (!Array.isArray(payload.articles) || payload.articles.length === 0) throw new Error("Belum ada artikel di arsip.");
-      const articles = payload.articles
+      const bySlug = new Map(payload.articles.map((article) => [article.slug, article]));
+      try {
+        const liveResponse = await fetch("/api/articles", { headers: { accept: "application/json" }, cache: "no-store" });
+        if (liveResponse.ok) {
+          const livePayload = await liveResponse.json();
+          for (const article of livePayload.articles || []) bySlug.set(article.slug, article);
+        }
+      } catch {
+        // Keep the static article archive available when the live API is not configured.
+      }
+      const articles = [...bySlug.values()]
         .filter((article) => article.status !== "draft")
         .sort((a, b) => new Date(b.date) - new Date(a.date));
       articles.forEach((article) => { article.displayTags = tagsFor(article); });
