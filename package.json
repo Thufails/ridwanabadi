@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:cloudflare": "node scripts/package-cloudflare.mjs"
+    "build:cloudflare": "node scripts/package-cloudflare.mjs",
+    "dev:local": "node scripts/article-editor-server.mjs"
   }
 }

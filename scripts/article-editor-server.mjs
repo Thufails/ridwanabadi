@@ -1,5 +1,6 @@
 import { createServer } from "node:http";
 import { mkdir, readFile, rename, unlink, writeFile } from "node:fs/promises";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
@@ -15,12 +16,61 @@ const mimeTypes = new Map([
   [".json", "application/json; charset=utf-8"], [".jpg", "image/jpeg"], [".jpeg", "image/jpeg"], [".png", "image/png"],
   [".webp", "image/webp"], [".svg", "image/svg+xml"], [".ico", "image/x-icon"]
 ]);
+const localVarsPath = path.join(projectRoot, ".dev.vars");
+const localSessionSeconds = 8 * 60 * 60;
 
-function sendJson(response, statusCode, value) {
+try {
+  const localVars = await readFile(localVarsPath, "utf8");
+  for (const line of localVars.split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^(["'])(.*)\1$/, "$2");
+  }
+} catch {
+  // Local credentials can also be supplied by the process environment.
+}
+
+function loginConfigured() {
+  return Boolean(process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD?.length >= 8 && process.env.ADMIN_SESSION_SECRET?.length >= 32);
+}
+
+function safeEqual(left, right) {
+  const a = Buffer.from(String(left));
+  const b = Buffer.from(String(right));
+  const size = Math.max(a.length, b.length, 1);
+  const paddedA = Buffer.alloc(size);
+  const paddedB = Buffer.alloc(size);
+  a.copy(paddedA);
+  b.copy(paddedB);
+  return timingSafeEqual(paddedA, paddedB) && a.length === b.length;
+}
+
+function signSession(payload) {
+  return createHmac("sha256", process.env.ADMIN_SESSION_SECRET).update(payload).digest("base64url");
+}
+
+function sessionCookie(request, clear = false) {
+  const secure = new URL(request.url || "/", `http://${host}:${port}`).protocol === "https:" ? "; Secure" : "";
+  if (clear) return `ridwan_admin_local=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secure}`;
+  const expires = Math.floor(Date.now() / 1000) + localSessionSeconds;
+  const payload = `v1.${expires}`;
+  return `ridwan_admin_local=${payload}.${signSession(payload)}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${localSessionSeconds}${secure}`;
+}
+
+function hasLocalSession(request) {
+  if (!loginConfigured()) return false;
+  const token = (request.headers.cookie || "").split(";").map((part) => part.trim()).find((part) => part.startsWith("ridwan_admin_local="))?.slice("ridwan_admin_local=".length) || "";
+  const [version, expiresText, signature, extra] = token.split(".");
+  const expires = Number(expiresText);
+  return version === "v1" && Boolean(signature) && !extra && Number.isSafeInteger(expires)
+    && expires > Math.floor(Date.now() / 1000) && safeEqual(signature, signSession(`${version}.${expires}`));
+}
+
+function sendJson(response, statusCode, value, extraHeaders = {}) {
   response.writeHead(statusCode, {
     "content-type": "application/json; charset=utf-8",
     "cache-control": "no-store",
-    "x-content-type-options": "nosniff"
+    "x-content-type-options": "nosniff",
+    ...extraHeaders
   });
   response.end(JSON.stringify(value));
 }
@@ -105,9 +155,11 @@ async function saveArticle(request, response) {
     const slug = existingSlug || slugify(payload.slug || title);
     const date = String(payload.date || "");
     const category = String(payload.category || "Artikel").trim().slice(0, 80) || "Artikel";
-    const excerpt = String(payload.excerpt || "").replace(/\s+/g, " ").trim().slice(0, 320);
+    const excerpt = String(payload.excerpt || payload.summary || String(payload.content || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;|&#160;/g, " "))
+      .replace(/\s+/g, " ").trim().slice(0, 320);
     const content = String(payload.content || "").trim();
-    const tags = Array.isArray(payload.tags) ? payload.tags.map((tag) => String(tag).trim().slice(0, 60)).filter(Boolean).slice(0, 20) : [];
+    const tagSource = Array.isArray(payload.tags) ? payload.tags : payload.topics;
+    const tags = Array.isArray(tagSource) ? tagSource.map((tag) => String(tag).trim().slice(0, 60)).filter(Boolean).slice(0, 20) : [];
     const status = String(payload.status || "published");
 
     if (!title || title.length > 180) return sendJson(response, 400, { error: "Judul wajib diisi (maksimal 180 karakter)." });
@@ -148,8 +200,11 @@ async function saveArticle(request, response) {
       sourceUrl: existingArticle?.sourceUrl || "",
       title,
       excerpt,
+      summary: String(payload.summary || excerpt).trim().slice(0, 240),
+      description: String(payload.description || "").trim().slice(0, 200),
       category,
       tags,
+      topics: Array.isArray(payload.topics) ? payload.topics.map((topic) => String(topic).trim()).filter(Boolean).slice(0, 30) : tags,
       status,
       featuredImage: uploadedCover?.relativePath || (payload.removeCover ? null : existingArticle?.featuredImage || existingArticle?.coverImage || null),
       coverImage: uploadedCover?.relativePath || (payload.removeCover ? null : existingArticle?.coverImage || existingArticle?.featuredImage || null),
@@ -192,6 +247,34 @@ async function listArticles(request, response) {
   }
 }
 
+async function deleteDraft(request, response, slug) {
+  const origin = request.headers.origin;
+  const requestHost = request.headers.host || "";
+  if (!new Set([`${host}:${port}`, `localhost:${port}`]).has(requestHost)
+    || (origin && ![`http://${host}:${port}`, `http://localhost:${port}`].includes(origin))) {
+    return sendJson(response, 403, { error: "Permintaan hanya boleh berasal dari editor lokal." });
+  }
+  try {
+    const archive = JSON.parse(await readFile(archivePath, "utf8"));
+    const article = archive.articles.find((entry) => entry.slug === slug);
+    if (!article) return sendJson(response, 404, { error: "Artikel tidak ditemukan." });
+    if (article.status !== "draft") return sendJson(response, 409, { error: "Hanya draf yang dapat dihapus dari editor lokal." });
+    archive.articles = archive.articles.filter((entry) => entry !== article);
+    archive.total = archive.articles.filter((entry) => entry.status !== "draft").length;
+    archive.updatedAt = new Date().toISOString();
+    await saveArchive(archive);
+    return sendJson(response, 200, { deleted: true });
+  } catch (error) {
+    console.error(error);
+    return sendJson(response, 500, { error: "Draf tidak berhasil dihapus." });
+  }
+}
+
+function hasLocalOrigin(request) {
+  const origin = request.headers.origin;
+  return !origin || [`http://${host}:${port}`, `http://localhost:${port}`].includes(origin);
+}
+
 async function serveStatic(request, response, pathname) {
   let decodedPath;
   try {
@@ -222,19 +305,66 @@ async function serveStatic(request, response, pathname) {
 
 const server = createServer(async (request, response) => {
   const url = new URL(request.url || "/", `http://${host}:${port}`);
-  if (url.pathname === "/api/articles" && request.method === "GET") return listArticles(request, response);
-  if (url.pathname === "/api/articles" && request.method === "POST") return saveArticle(request, response);
-  if (url.pathname.startsWith("/api/articles/") && request.method === "PUT") {
-    let slug;
-    try {
-      slug = decodeURIComponent(url.pathname.slice("/api/articles/".length));
-    } catch {
-      return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
-    }
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
-    request.existingArticleSlug = slug;
-    return saveArticle(request, response);
+  const localHostAllowed = new Set([`${host}:${port}`, `localhost:${port}`]).has(request.headers.host || "");
+
+  if (url.pathname === "/api/auth/session" && request.method === "GET") {
+    return sendJson(response, 200, { configured: loginConfigured(), authenticated: hasLocalSession(request) });
   }
+  if (url.pathname === "/api/auth/login" && request.method === "POST") {
+    if (!localHostAllowed || !hasLocalOrigin(request)) return sendJson(response, 403, { error: "Permintaan login ditolak." });
+    if (!loginConfigured()) return sendJson(response, 503, { error: "Akun lokal belum disiapkan. Isi .dev.vars terlebih dahulu." });
+    try {
+      const credentials = await readJsonBody(request);
+      const email = String(credentials.email || "").trim().toLowerCase();
+      const password = String(credentials.password || "");
+      if (!safeEqual(email, process.env.ADMIN_EMAIL.trim().toLowerCase()) || !safeEqual(password, process.env.ADMIN_PASSWORD)) {
+        return sendJson(response, 401, { error: "Email atau kata sandi salah." });
+      }
+      response.setHeader("Set-Cookie", sessionCookie(request));
+      return sendJson(response, 200, { authenticated: true });
+    } catch (error) {
+      return sendJson(response, error.statusCode || 400, { error: error.message || "Format permintaan tidak valid." });
+    }
+  }
+  if (url.pathname === "/api/auth/logout" && request.method === "POST") {
+    if (!localHostAllowed || !hasLocalOrigin(request)) return sendJson(response, 403, { error: "Permintaan logout ditolak." });
+    response.setHeader("Set-Cookie", sessionCookie(request, true));
+    return sendJson(response, 200, { loggedOut: true });
+  }
+
+  const isAdminPage = url.pathname === "/admin" || url.pathname.startsWith("/admin/");
+  const publicAdminPaths = new Set(["/admin/login", "/admin/login.html", "/admin/login.css", "/admin/login.js"]);
+  const isAdminApi = url.pathname === "/api/admin" || url.pathname.startsWith("/api/admin/");
+  const authenticated = hasLocalSession(request);
+  if (isAdminApi && !authenticated) return sendJson(response, 401, { error: "Sesi login dibutuhkan." });
+  if (isAdminPage && publicAdminPaths.has(url.pathname)) {
+    if (authenticated && ["/admin/login", "/admin/login.html"].includes(url.pathname)) {
+      response.writeHead(302, { Location: "/admin/" }).end();
+      return;
+    }
+  } else if (isAdminPage && !authenticated) {
+    const destination = url.pathname + url.search;
+    response.writeHead(302, { Location: `/admin/login.html?next=${encodeURIComponent(destination)}` }).end();
+    return;
+  }
+
+  if (url.pathname === "/admin/login") url.pathname = "/admin/login.html";
+  if (url.pathname === "/admin" || url.pathname === "/admin/") url.pathname = "/admin/index.html";
+  if (url.pathname === "/api/admin/articles" && request.method === "GET") return listArticles(request, response);
+  if (url.pathname === "/api/admin/articles" && request.method === "POST") return saveArticle(request, response);
+  if (url.pathname.startsWith("/api/admin/articles/")) {
+    let slug;
+    try { slug = decodeURIComponent(url.pathname.slice("/api/admin/articles/".length)); }
+    catch { return sendJson(response, 400, { error: "Alamat artikel tidak valid." }); }
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return sendJson(response, 400, { error: "Alamat artikel tidak valid." });
+    if (request.method === "PUT") {
+      request.existingArticleSlug = slug;
+      return saveArticle(request, response);
+    }
+    if (request.method === "DELETE") return deleteDraft(request, response, slug);
+    return sendJson(response, 405, { error: "Metode tidak diizinkan." }, { allow: "PUT, DELETE" });
+  }
+  if (url.pathname === "/api/articles" && request.method === "GET") return listArticles(request, response);
   if (url.pathname.startsWith("/api/")) return sendJson(response, 404, { error: "Endpoint tidak ditemukan." });
   if (!new Set(["GET", "HEAD"]).has(request.method)) {
     response.writeHead(405, { allow: "GET, HEAD, POST" }).end("Method not allowed");
@@ -244,8 +374,8 @@ const server = createServer(async (request, response) => {
 });
 
 server.listen(port, host, () => {
-  console.log(`Editor artikel lokal siap: http://${host}:${port}/kelola-artikel.html`);
-  console.log("Server hanya mendengarkan di komputer ini; hentikan dengan Ctrl+C.");
+  console.log(`Login admin lokal: http://${host}:${port}/admin/login.html`);
+  console.log("Server lokal hanya mendengarkan di komputer ini; hentikan dengan Ctrl+C.");
 });
 
 server.on("error", (error) => {

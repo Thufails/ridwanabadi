@@ -43,7 +43,7 @@ Proyek Pages menggunakan build command `npm run build:cloudflare` dan output dir
 
 ## Pengembangan lokal
 
-`kelola-artikel.html` mengarahkan ke halaman login Cloudflare. Login hanya berfungsi saat Pages Functions berjalan; Live Server biasa tidak menyediakan autentikasi. Untuk pengembangan lokal gunakan Wrangler Pages dengan binding D1/R2 lokal. Salin `.dev.vars.example` menjadi `.dev.vars`, isi kredensial lokal sendiri, dan jangan commit file `.dev.vars`.
+Jalankan `npm run dev:local`, lalu buka `http://127.0.0.1:4174/admin/login.html`. Server lokal membaca kredensial dari `.dev.vars`, menyimpan artikel ke `data/articles.json`, dan menyimpan sampul di `assets/articles/`. File `.dev.vars` diabaikan Git; jangan commit atau pakai nilai lokal sebagai kredensial Production. Live Server biasa tidak menjalankan login/API ini.
 
 ## Penyimpanan dan keamanan
 

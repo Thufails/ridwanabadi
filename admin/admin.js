@@ -117,6 +117,15 @@
         fields.date.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
     }
 
+    function fileAsDataUrl(file) {
+        return new Promise(function (resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function () { resolve(String(reader.result || "")); };
+            reader.onerror = function () { reject(new Error("Foto sampul gagal dibaca.")); };
+            reader.readAsDataURL(file);
+        });
+    }
+
     function setCoverPreview(file) {
         if (coverObjectUrl) URL.revokeObjectURL(coverObjectUrl);
         coverObjectUrl = "";
@@ -261,12 +270,16 @@
         try {
             const selectedCover = coverFile.files && coverFile.files[0];
             if (selectedCover) {
-                const form = new FormData();
-                form.set("file", selectedCover);
-                const upload = await fetch("/api/admin/images", { method: "POST", credentials: "same-origin", body: form });
-                const uploaded = await upload.json();
-                if (!upload.ok) throw new Error(uploaded.error || "Foto sampul gagal diunggah.");
-                currentCoverImage = uploaded.coverImage;
+                if (["localhost", "127.0.0.1"].includes(window.location.hostname)) {
+                    article.coverDataUrl = await fileAsDataUrl(selectedCover);
+                } else {
+                    const form = new FormData();
+                    form.set("file", selectedCover);
+                    const upload = await fetch("/api/admin/images", { method: "POST", credentials: "same-origin", body: form });
+                    const uploaded = await upload.json();
+                    if (!upload.ok) throw new Error(uploaded.error || "Foto sampul gagal diunggah.");
+                    currentCoverImage = uploaded.coverImage;
+                }
             }
             article.coverImage = currentCoverImage;
             article.featuredImage = currentCoverImage;
@@ -308,7 +321,7 @@
         articleCatalog = Array.isArray(result.articles) ? result.articles : [];
         if (staticResponse.ok) {
             const staticArchive = await staticResponse.json();
-            staticArticleSlugs = new Set((staticArchive.articles || []).map(function (article) { return article.slug; }));
+            staticArticleSlugs = new Set((staticArchive.articles || []).filter(function (article) { return article.status !== "draft"; }).map(function (article) { return article.slug; }));
         }
         catalogReady = true;
         renderDraftList();
